@@ -1,4 +1,6 @@
 [workspace]
-    members = [ 
-        "ray", 
+resolver = "2"
+
+members = [ 
+    "ray", 
     ] 
