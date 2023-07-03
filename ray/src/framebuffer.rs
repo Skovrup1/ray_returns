@@ -1,7 +1,7 @@
 use image::{self, ImageError, ImageFormat};
 use std::path::Path;
 
-use crate::ray_const::{HEIGHT, WIDTH};
+use crate::utility::{HEIGHT, WIDTH};
 
 pub fn save_img(img: &[u8]) -> () {
     let res: Result<(), ImageError>;

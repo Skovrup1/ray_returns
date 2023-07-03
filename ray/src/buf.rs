@@ -1,5 +1,5 @@
 use crate::{
-    ray_const::{HEIGHT, WIDTH},
+    utility::{HEIGHT, WIDTH},
     vec::Vect3,
 };
 
@@ -21,10 +21,16 @@ impl Buf {
         }
     }
 
-    pub fn change_pix(&mut self, x: u32, y: u32, color: Vect3) -> () {
+    pub fn write_color(&mut self, x: u32, y: u32, color: Vect3, samples: u32) -> () {
+        let scale = (samples as f32).recip();
+        //adjust for gamma = 2
+        let r = (color.x * scale).sqrt();
+        let g = (color.y * scale).sqrt();
+        let b = (color.z * scale).sqrt();
+        
         let index = ((x + y * self.width) * 3) as usize;
-        self.data[index] = (color.x * 255.999) as u8;
-        self.data[index + 1] = (color.y * 255.999) as u8;
-        self.data[index + 2] = (color.z * 255.999) as u8;
+        self.data[index] = (256.0 * r.clamp(0.0, 0.999)) as u8;
+        self.data[index + 1] = (256.0 * g.clamp(0.0, 0.999)) as u8;
+        self.data[index + 2] = (256.0 * b.clamp(0.0, 0.999)) as u8;
     }
 }

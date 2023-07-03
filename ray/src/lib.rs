@@ -1,7 +1,9 @@
+#[allow(dead_code)]
 pub mod buf;
+pub mod camera;
+pub mod framebuffer;
 pub mod hittable;
 pub mod hittable_list;
-pub mod ray_const;
-pub mod ray_img;
 pub mod sphere;
+pub mod utility;
 pub mod vec;
