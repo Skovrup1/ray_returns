@@ -29,7 +29,7 @@ impl Buf {
         let r = (color.x * scale).sqrt();
         let g = (color.y * scale).sqrt();
         let b = (color.z * scale).sqrt();
-        
+
         let index = ((x + y * self.width) * 3) as usize;
         self.data[index] = (256.0 * r.clamp(0.0, 0.999)) as u8;
         self.data[index + 1] = (256.0 * g.clamp(0.0, 0.999)) as u8;

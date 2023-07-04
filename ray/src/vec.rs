@@ -20,9 +20,9 @@ pub trait ReflectExt {
 }
 
 impl ReflectExt for Vect3 {
-   fn reflect(&self, n: Vect3) -> Vect3 {
-       self - 2.0*self.dot(&n)*n
-   } 
+    fn reflect(&self, n: Vect3) -> Vect3 {
+        self - 2.0 * self.dot(&n) * n
+    }
 }
 
 #[derive(Clone)]

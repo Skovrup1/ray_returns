@@ -2,7 +2,8 @@ use std::rc::Rc;
 
 use crate::{
     hittable::{HitRecord, Hittable},
-    vec::{Poin3, Ray}, material::Material,
+    material::Material,
+    vec::{Poin3, Ray},
 };
 
 pub struct Sphere {
@@ -44,6 +45,10 @@ impl Hittable for Sphere {
 
 impl Sphere {
     pub fn new(center: Poin3, radius: f32, mat: Rc<dyn Material>) -> Self {
-        Sphere { center, radius, mat }
+        Sphere {
+            center,
+            radius,
+            mat,
+        }
     }
 }
