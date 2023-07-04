@@ -1,5 +1,6 @@
-use std::{f32::INFINITY, rc::Rc};
+use std::{f32::INFINITY, rc::Rc, ops::Mul};
 
+use nalgebra::Vector3;
 use rand::{Rng};
 use ray::{
     buf::Buf,
@@ -9,18 +10,23 @@ use ray::{
     hittable_list::HittableList,
     sphere::Sphere,
     utility::{HEIGHT, WIDTH},
-    vec::{Color, Poin3, Ray, random_in_hemisphere},
+    vec::{Color, Poin3, Ray, Vect3}, material::{Lambertian, Metal},
 };
 
 fn ray_color(r: &Ray, world: &HittableList, depth: u32) -> Color {
     if depth <= 0 {
         return Color::new(0.0, 0.0, 0.0);
     }
-
     let mut rec: HitRecord = Default::default();
+    
     if world.hit(r, 0.001, INFINITY, &mut rec) {
-        let target = rec.p +  random_in_hemisphere(&rec.normal);
-        return 0.5 * ray_color(&Ray::new(rec.p, target - rec.p), &world, depth - 1);
+        let mut scatter_r: Ray = Ray::new(Poin3::zeros(), Vect3::zeros());
+        let mut attenuation: Color = Color::zeros();
+        if rec.mat.scatter(r, &rec, &mut attenuation, &mut scatter_r) {
+            return attenuation.component_mul(&ray_color(&scatter_r, &world, depth - 1))
+        }
+
+        return Color::new(0.0, 0.0, 0.0);
     }
 
     let unit_dir = r.dir.normalize();
@@ -40,8 +46,16 @@ fn main() {
 
     // World
     let mut world: HittableList = Default::default();
-    world.add(Rc::new(Sphere::new(Poin3::new(0.0, 0.0, -1.0), 0.5)));
-    world.add(Rc::new(Sphere::new(Poin3::new(0.0, -100.5, -1.0), 100.0)));
+
+    let mat_ground = Rc::new(Lambertian::new(Color::new(0.8, 0.8, 0.0)));
+    let mat_center = Rc::new(Lambertian::new(Color::new(0.7, 0.3, 0.0)));
+    let mat_left = Rc::new(Metal::new(Color::new(0.8, 0.8, 0.8)));
+    let mat_right = Rc::new(Metal::new(Color::new(0.8, 0.6, 0.2)));
+
+    world.add(Rc::new(Sphere::new(Poin3::new(0.0, -100.5, -1.0), 100.0, mat_ground)));
+    world.add(Rc::new(Sphere::new(Poin3::new(0.0, 0.0, -1.0), 0.5, mat_center)));
+    world.add(Rc::new(Sphere::new(Poin3::new(-1.0, 0.0, -1.0), 0.5, mat_left)));
+    world.add(Rc::new(Sphere::new(Poin3::new(1.0, 0.0, -1.0), 0.5, mat_right)));
 
     // Render
     let mut rng = rand::thread_rng();

@@ -1,11 +1,19 @@
-use crate::vec::{Poin3, Ray, Vect3};
+use std::{rc::Rc};
 
-#[derive(Default)]
+use crate::{vec::{Poin3, Ray, Vect3}, material::{Material}};
+
 pub struct HitRecord {
     pub p: Poin3,
     pub normal: Vect3,
+    pub mat: Rc<dyn Material>,
     pub t: f32,
     pub front_face: bool,
+}
+
+impl Default for HitRecord {
+    fn default() -> Self {
+        Self { p: Default::default(), normal: Default::default(), mat: <dyn Material>::default(), t: Default::default(), front_face: Default::default() }
+    }
 }
 
 impl HitRecord {

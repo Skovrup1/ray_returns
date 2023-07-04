@@ -7,3 +7,4 @@ pub mod hittable_list;
 pub mod sphere;
 pub mod utility;
 pub mod vec;
+pub mod material;
