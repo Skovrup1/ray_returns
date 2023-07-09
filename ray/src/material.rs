@@ -1,7 +1,8 @@
+use rand::{Rng, thread_rng};
+
 use crate::hitable::HitRecord;
 use crate::ray::Ray;
-use crate::utility::random_float;
-use crate::vec::{Color, Vec3};
+use crate::vec::{random_in_hemisphere, random_in_unit_sphere, Color, ReflectExt, RefractExt};
 
 pub trait Material {
     fn scatter(
@@ -31,15 +32,16 @@ impl Material for Lambertian {
         attenuation: &mut Color,
         scattered: &mut Ray,
     ) -> bool {
-        let scatter_direction = rec.normal + Vec3::random_unit_vector();
+        let scatter_dir = random_in_hemisphere(rec.normal);
 
-        let scatter_direction = if scatter_direction.near_zero() {
-            rec.normal
-        } else {
-            scatter_direction
-        };
+        let eps = f32::EPSILON;
+        let is_zero = (scatter_dir.x.abs() < eps)
+            && (scatter_dir.y.abs() < eps)
+            && (scatter_dir.z.abs() < eps);
 
-        *scattered = Ray::new(rec.p, scatter_direction);
+        let scatter_dir = if is_zero { rec.normal } else { scatter_dir };
+
+        *scattered = Ray::new(rec.p, scatter_dir);
         *attenuation = self.albedo;
 
         true
@@ -68,9 +70,9 @@ impl Material for Metal {
         attenuation: &mut Color,
         scattered: &mut Ray,
     ) -> bool {
-        let reflected = r_in.dir().unit_vector().reflect(rec.normal);
+        let reflected = r_in.dir().normalize().reflect(rec.normal);
 
-        *scattered = Ray::new(rec.p, reflected + self.fuzz * Vec3::random_in_unit_sphere());
+        *scattered = Ray::new(rec.p, reflected + self.fuzz * random_in_unit_sphere());
         *attenuation = self.albedo;
 
         scattered.dir().dot(&rec.normal) > 0.0
@@ -98,18 +100,18 @@ impl Material for Dielectric {
         *attenuation = Color::new(1.0, 1.0, 1.0);
 
         let refraction_ratio = if rec.front_face {
-            1.0 / self.ir
+            self.ir.recip()
         } else {
             self.ir
         };
 
-        let unit_direction = r_in.dir().unit_vector();
+        let unit_direction = r_in.dir().normalize();
 
         let cos_theta = -unit_direction.dot(&rec.normal).min(1.0);
-        let sin_theta = (1.0 - cos_theta * cos_theta).sqrt();
+        let sin_theta = (1.0f32 - cos_theta.powi(2)).sqrt();
 
         let cannot_refract = refraction_ratio * sin_theta > 1.0;
-        let should_relect = reflectance(cos_theta, refraction_ratio) > random_float();
+        let should_relect = reflectance(cos_theta, refraction_ratio) > thread_rng().gen();
 
         let direction = if cannot_refract || should_relect {
             unit_direction.reflect(rec.normal)

@@ -1,7 +1,7 @@
 use image::{self, ImageError, ImageFormat};
 use std::path::Path;
 
-use crate::utility::{HEIGHT, WIDTH};
+use crate::utility::{IMAGE_HEIGHT, IMAGE_WIDTH};
 
 pub fn save_img(img: &[u8]) -> () {
     let res: Result<(), ImageError>;
@@ -16,8 +16,8 @@ pub fn save_img(img: &[u8]) -> () {
             res = image::save_buffer_with_format(
                 path,
                 img,
-                WIDTH,
-                HEIGHT,
+                IMAGE_WIDTH,
+                IMAGE_HEIGHT,
                 image::ColorType::Rgb8,
                 ImageFormat::Png,
             );
@@ -38,8 +38,8 @@ pub fn save_img_override(img: &[u8]) -> () {
     let res = image::save_buffer_with_format(
         path,
         img,
-        WIDTH,
-        HEIGHT,
+        IMAGE_WIDTH,
+        IMAGE_HEIGHT,
         image::ColorType::Rgb8,
         ImageFormat::Png,
     );
