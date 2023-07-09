@@ -1,7 +1,7 @@
 use crate::hitable::HitRecord;
 use crate::ray::Ray;
 use crate::utility::random_float;
-use crate::vec::{Color, Vec3};
+use crate::vec::{Color, random_unit_vector, random_in_unit_sphere};
 
 pub trait Material {
     fn scatter(
@@ -31,7 +31,7 @@ impl Material for Lambertian {
         attenuation: &mut Color,
         scattered: &mut Ray,
     ) -> bool {
-        let scatter_direction = rec.normal + Vec3::random_unit_vector();
+        let scatter_direction = rec.normal + random_unit_vector();
 
         let scatter_direction = if scatter_direction.near_zero() {
             rec.normal
@@ -70,7 +70,7 @@ impl Material for Metal {
     ) -> bool {
         let reflected = r_in.dir().unit_vector().reflect(rec.normal);
 
-        *scattered = Ray::new(rec.p, reflected + self.fuzz * Vec3::random_in_unit_sphere());
+        *scattered = Ray::new(rec.p, reflected + self.fuzz * random_in_unit_sphere());
         *attenuation = self.albedo;
 
         scattered.dir().dot(&rec.normal) > 0.0
@@ -98,7 +98,7 @@ impl Material for Dielectric {
         *attenuation = Color::new(1.0, 1.0, 1.0);
 
         let refraction_ratio = if rec.front_face {
-            1.0 / self.ir
+            self.ir.recip()
         } else {
             self.ir
         };
@@ -106,7 +106,7 @@ impl Material for Dielectric {
         let unit_direction = r_in.dir().unit_vector();
 
         let cos_theta = -unit_direction.dot(&rec.normal).min(1.0);
-        let sin_theta = (1.0 - cos_theta * cos_theta).sqrt();
+        let sin_theta = (1.0f32 - cos_theta.powi(2)).sqrt();
 
         let cannot_refract = refraction_ratio * sin_theta > 1.0;
         let should_relect = reflectance(cos_theta, refraction_ratio) > random_float();

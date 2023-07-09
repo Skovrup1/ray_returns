@@ -2,7 +2,7 @@
 
 use crate::hitable::{HitRecord, Hitable};
 use crate::hitable_list::HitableList;
-use crate::vec::{Color, Point3, Vec3};
+use crate::vec::{Color};
 
 #[derive(Copy, Clone, Debug)]
 pub struct Ray {

@@ -1,17 +1,18 @@
+use nalgebra::Vector3;
+
 use crate::hitable::*;
 use crate::material::*;
 use crate::ray::*;
-use crate::vec::*;
 use std::rc::Rc;
 
 pub struct Sphere {
-    center: Vec3,
+    center: Vector3<f32>,
     radius: f32,
     mat: Rc<dyn Material>,
 }
 
 impl Sphere {
-    pub fn new(center: Vec3, radius: f32, mat: Rc<dyn Material>) -> Sphere {
+    pub fn new(center: Vector3<f32>, radius: f32, mat: Rc<dyn Material>) -> Sphere {
         Sphere {
             center,
             radius,
