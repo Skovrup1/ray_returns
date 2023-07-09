@@ -1,3 +1,5 @@
 /target
 .vscode/settings.json
-.png
+#ignore all png files not in the images folder
+*.png
+!images/*.png
