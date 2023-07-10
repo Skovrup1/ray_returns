@@ -1,10 +1,9 @@
 #![allow(dead_code)]
-
-use nalgebra::Vector3;
-
-use crate::hitable::{HitRecord, Hitable};
+use crate::hitable::Hitable;
 use crate::hitable_list::HitableList;
+use crate::material::Scatterable;
 use crate::vec::Color;
+use nalgebra::Vector3;
 
 #[derive(Copy, Clone, Debug)]
 pub struct Ray {
@@ -36,19 +35,16 @@ impl Ray {
         self.origin() + self.dir() * t
     }
 
-    pub fn color(&self, rec: &mut HitRecord, world: &HitableList, depth: i32) -> Color {
+    pub fn color(&self, world: &HitableList, depth: i32) -> Color {
         if depth <= 0 {
             return Color::new(0.0, 0.0, 0.0);
         }
 
-        if world.hit(self, 0.001, f32::INFINITY, rec) {
-            let mut scattered = Ray::zero();
-            let mut attenuation = Color::zeros();
+        if let Some(hit) = world.hit(self, 0.001, f32::INFINITY) {
+            let is_scattered = hit.mat.scatter(self, &hit);
 
-            let is_scattered = rec.mat.scatter(self, rec, &mut attenuation, &mut scattered);
-
-            if is_scattered {
-                return attenuation.component_mul(&scattered.color(rec, world, depth - 1));
+            if let Some((attenuation, scattered)) = is_scattered {
+                return attenuation.component_mul(&scattered.color(world, depth - 1));
             } else {
                 return Color::new(0.0, 0.0, 0.0);
             }

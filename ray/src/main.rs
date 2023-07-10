@@ -11,5 +11,6 @@ pub mod utility;
 pub mod vec;
 
 fn main() {
-    tracer::render();
+    //tracer::render();
+    tracer::par_render();
 }

@@ -3,16 +3,15 @@ use nalgebra::Vector3;
 use crate::hitable::*;
 use crate::material::*;
 use crate::ray::*;
-use std::rc::Rc;
 
 pub struct Sphere {
     center: Vector3<f32>,
     radius: f32,
-    mat: Rc<dyn Material>,
+    mat: Material,
 }
 
 impl Sphere {
-    pub fn new(center: Vector3<f32>, radius: f32, mat: Rc<dyn Material>) -> Sphere {
+    pub fn new(center: Vector3<f32>, radius: f32, mat: Material) -> Sphere {
         Sphere {
             center,
             radius,
@@ -22,7 +21,7 @@ impl Sphere {
 }
 
 impl Hitable for Sphere {
-    fn hit(&self, r: &Ray, t_min: f32, t_max: f32, rec: &mut HitRecord) -> bool {
+    fn hit(&self, r: &Ray, t_min: f32, t_max: f32) -> Option<HitRecord> {
         let oc = r.origin() - self.center;
         let a = r.dir().norm_squared();
         let half_b = oc.dot(&r.dir());
@@ -31,7 +30,7 @@ impl Hitable for Sphere {
         let discriminant = half_b * half_b - a * c;
 
         if discriminant < 0.0 {
-            return false;
+            return None;
         }
 
         let sqrtd = discriminant.sqrt();
@@ -41,18 +40,17 @@ impl Hitable for Sphere {
             root = (-half_b + sqrtd) / a;
 
             if root < t_min || t_max < root {
-                return false;
+                return None;
             }
         }
 
-        rec.t = root;
-        rec.p = r.at(rec.t);
+        let mut hit = HitRecord::default();
+        hit.t = root;
+        hit.p = r.at(hit.t);
+        let outward_normal = (hit.p - self.center) / self.radius;
+        hit.set_face_normal(r, outward_normal);
+        hit.mat = self.mat;
 
-        let outward_normal = (rec.p - self.center) / self.radius;
-        rec.set_face_normal(r, outward_normal);
-
-        rec.mat = self.mat.clone();
-
-        true
+        Some(hit)
     }
 }

@@ -52,13 +52,13 @@ impl RandomExt for Vector3<f32> {
     }
 }
 
-pub fn random_in_hemisphere(n: Vector3<f32>) -> Vector3<f32> {
+pub fn random_in_hemisphere(n: &Vector3<f32>) -> Vector3<f32> {
     let unit_sphere = random_in_unit_sphere();
 
-    if unit_sphere.dot(&n) > 0.0 {
-        return unit_sphere;
+    if unit_sphere.dot(n) > 0.0 {
+        unit_sphere
     } else {
-        return -unit_sphere;
+        -unit_sphere
     }
 }
 

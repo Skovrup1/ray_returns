@@ -9,8 +9,6 @@ pub struct Buf {
     height: u32,
 }
 
-//impl deref
-
 impl Buf {
     pub fn default() -> Self {
         let data = vec![0; (IMAGE_WIDTH * IMAGE_HEIGHT * 3) as usize];
