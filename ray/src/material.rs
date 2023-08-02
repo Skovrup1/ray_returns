@@ -1,7 +1,7 @@
 use crate::hitable::HitRecord;
 use crate::ray::Ray;
 use crate::vec::{
-    random_in_unit_sphere, random_unit_vector, Color, ReflectExt, RefractExt, random_in_hemisphere,
+    random_in_hemisphere, random_in_unit_sphere, random_unit_vector, Color, ReflectExt, RefractExt,
 };
 use rand::{thread_rng, Rng};
 

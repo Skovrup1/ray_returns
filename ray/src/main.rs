@@ -1,3 +1,4 @@
+mod aabb;
 pub mod buf;
 pub mod camera;
 pub mod hitable;
