@@ -1,10 +1,13 @@
+use std::cmp;
+
 use nalgebra::Vector3;
 
 use crate::ray::Ray;
 
+#[derive(Copy, Clone, Default)]
 pub struct AABB {
-    min: Vector3<f32>,
-    max: Vector3<f32>,
+    pub min: Vector3<f32>,
+    pub max: Vector3<f32>,
 }
 
 impl AABB {
@@ -32,4 +35,22 @@ impl AABB {
         }
         true
     }
+
+    pub fn new_from_aabb(first_box: AABB, other_box: AABB) -> AABB {
+        let x = first_box.min[0]
+            .min(other_box.min[0])
+            .min(first_box.max[0].max(other_box.max[0]));
+
+        let y = first_box.min[1]
+            .min(other_box.min[1])
+            .min(first_box.max[1].max(other_box.max[1]));
+
+        let z = first_box.min[2]
+            .min(other_box.min[2])
+            .min(first_box.max[2].max(other_box.max[2]));
+
+        AABB {}
+    }
+
+    pub fn surrounding_box(&self, output_box: AABB) -> AABB {}
 }

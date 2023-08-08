@@ -1,3 +1,4 @@
+use crate::aabb::AABB;
 use crate::hitable::*;
 use crate::ray::*;
 use crate::sphere::Sphere;
@@ -33,5 +34,29 @@ impl Hitable for HitableList {
         }
 
         hit_anything
+    }
+
+    fn bounding_box(&self) -> Option<AABB> {
+        if self.objects.is_empty() {
+            return None;
+        }
+
+        let mut is_first = true;
+        let mut output_box = AABB::default();
+
+        for (i, obj) in self.objects.iter().enumerate() {
+            if let Some(bounding) = obj.bounding_box() {
+                if is_first {
+                    output_box = bounding;
+                } else {
+                    output_box = bounding.surrounding_box(output_box);
+                }
+            } else {
+                return None;
+            }
+
+            is_first = false;
+        }
+        None
     }
 }

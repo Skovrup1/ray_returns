@@ -1,5 +1,6 @@
 use nalgebra::Vector3;
 
+use crate::aabb::AABB;
 use crate::hitable::*;
 use crate::material::*;
 use crate::ray::*;
@@ -8,14 +9,22 @@ pub struct Sphere {
     center: Vector3<f32>,
     radius: f32,
     mat: Material,
+    bbox: AABB,
 }
 
 impl Sphere {
     pub fn new(center: Vector3<f32>, radius: f32, mat: Material) -> Sphere {
+        let rvec = Vector3::new(radius, radius, radius);
+        let bbox = AABB {
+            min: center - rvec,
+            max: center + rvec,
+        };
+
         Sphere {
             center,
             radius,
             mat,
+            bbox,
         }
     }
 }
@@ -52,5 +61,9 @@ impl Hitable for Sphere {
         hit.mat = self.mat;
 
         Some(hit)
+    }
+
+    fn bounding_box(&self) -> Option<AABB> {
+        Some(self.bbox)
     }
 }

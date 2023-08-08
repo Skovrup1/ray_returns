@@ -1,5 +1,6 @@
 use nalgebra::Vector3;
 
+use crate::aabb::AABB;
 use crate::material::*;
 use crate::ray::*;
 
@@ -25,6 +26,9 @@ impl HitRecord {
 
 pub trait Hitable {
     fn hit(&self, _r: &Ray, _t_min: f32, _t_max: f32) -> Option<HitRecord> {
+        None
+    }
+    fn bounding_box(&self) -> Option<AABB> {
         None
     }
 }
